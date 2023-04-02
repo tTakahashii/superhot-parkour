@@ -7,7 +7,7 @@ public static class GameState
     private static bool gamePaused = false;
     private static float timescale = 1f;
 
-    public static bool GetState()
+    public static bool IsPaused()
     {
         return gamePaused;
     }
@@ -44,7 +44,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        gamePaused = GameState.GetState();
+        gamePaused = GameState.IsPaused();
 
         Time.timeScale = gamePaused ? 0.001f : 1f;
         MouseManager(gamePaused);
@@ -82,9 +82,9 @@ public class GameManager : MonoBehaviour
 
     private void OnStateChange()
     {
-        if (gamePaused != GameState.GetState())
+        if (gamePaused != GameState.IsPaused())
         {
-            gamePaused = GameState.GetState();
+            gamePaused = GameState.IsPaused();
 
             Time.timeScale = gamePaused ? 0.01f : GameState.GetTimeScale();
 

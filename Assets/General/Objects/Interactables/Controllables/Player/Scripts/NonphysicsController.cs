@@ -10,7 +10,7 @@ public class NonphysicsController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!GameState.GetState())
+        if (!GameState.IsPaused())
         {
             Vector3 position = transform.localPosition;
 

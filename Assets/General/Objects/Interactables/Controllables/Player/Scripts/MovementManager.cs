@@ -8,6 +8,7 @@ public class MovementManager : MonoBehaviour
     [SerializeField] private MovementState playerState;
     private MovementState previousState;
     [SerializeField] private MonoBehaviour controllerScript, physicsScript, nonPhysicsScript;
+    [SerializeField] private MonoBehaviour nonPhysicsMouse, normalMouse;
 
     // Update is called once per frame
     void Update()
@@ -32,6 +33,9 @@ public class MovementManager : MonoBehaviour
 
                 physicsScript.enabled = false;
                 nonPhysicsScript.enabled = false;
+
+                normalMouse.enabled = true;
+                nonPhysicsMouse.enabled = false;
             }
 
             if (playerState == MovementState.physicsBased)
@@ -40,6 +44,9 @@ public class MovementManager : MonoBehaviour
 
                 controllerScript.enabled = false;
                 nonPhysicsScript.enabled = false;
+
+                normalMouse.enabled = true;
+                nonPhysicsMouse.enabled = false;
             }
 
             if (playerState == MovementState.nonPhysicsBased)
@@ -48,6 +55,9 @@ public class MovementManager : MonoBehaviour
 
                 controllerScript.enabled = false;
                 physicsScript.enabled = false;
+
+                normalMouse.enabled = false;
+                nonPhysicsMouse.enabled = true;
             }
         }
     }

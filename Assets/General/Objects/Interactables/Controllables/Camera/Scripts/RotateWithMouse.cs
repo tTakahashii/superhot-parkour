@@ -26,7 +26,7 @@ public class RotateWithMouse : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (!GameState.GetState())
+        if (!GameState.IsPaused())
         {
             targetRotation += new Vector3(Input.GetAxis("Mouse Y") * mouseSpeedY, Input.GetAxis("Mouse X") * mouseSpeedX, 0f);
             targetRotation.x = Mathf.Clamp(targetRotation.x, yClamp.x, yClamp.y);
