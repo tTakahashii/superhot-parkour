@@ -5,8 +5,9 @@ using UnityEngine;
 public static class GameState
 {
     private static bool gamePaused = false;
+    private static float timescale = 1f;
 
-    public static bool IsPaused()
+    public static bool GetState()
     {
         return gamePaused;
     }
@@ -20,6 +21,16 @@ public static class GameState
     {
         gamePaused = true;
     }
+
+    public static float GetTimeScale()
+    {
+        return timescale;
+    }
+
+    public static void SetTimeScale(float scale = 1f)
+    {
+        timescale = scale;
+    }
 }
 
 public class GameManager : MonoBehaviour
@@ -29,11 +40,13 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject[] objectsDisabledAtGamePause;
 
     private bool gamePaused;
+    [HideInInspector] public float timescale = 1f;
 
     private void Start()
     {
-        gamePaused = GameState.IsPaused();
+        gamePaused = GameState.GetState();
 
+        Time.timeScale = gamePaused ? 0.001f : 1f;
         MouseManager(gamePaused);
 
         EnableAtGamePause(objectsEnabledAtGamePause);
@@ -69,9 +82,11 @@ public class GameManager : MonoBehaviour
 
     private void OnStateChange()
     {
-        if (gamePaused != GameState.IsPaused())
+        if (gamePaused != GameState.GetState())
         {
-            gamePaused = GameState.IsPaused();
+            gamePaused = GameState.GetState();
+
+            Time.timeScale = gamePaused ? 0.01f : GameState.GetTimeScale();
 
             MouseManager(gamePaused);
 
@@ -79,6 +94,8 @@ public class GameManager : MonoBehaviour
             DisableAtGamePause(objectsDisabledAtGamePause);
         }
     }
+
+    
 
     private void EnableAtGamePause(GameObject[] objectsEnabledAtGamePause)
     {

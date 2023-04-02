@@ -26,21 +26,24 @@ public class RotateWithMouse : MonoBehaviour
     // Update is called once per frame
     private void Update()
     {
-        targetRotation += new Vector3(Input.GetAxis("Mouse Y") * mouseSpeedY, Input.GetAxis("Mouse X") * mouseSpeedX, 0f);
-        targetRotation.x = Mathf.Clamp(targetRotation.x, yClamp.x, yClamp.y);
-        targetRotation.z = 0f;
-
-        lerpTimer += Time.deltaTime * lerpSpeed;
-        lerpTimer = targetRotation == currentRotation ? 0f : lerpTimer;
-        currentRotation = lerpTimer >= 1f ? targetRotation : currentRotation;
-
-        if (smoothLerp)
+        if (!GameState.GetState())
         {
-            transform.localRotation = Quaternion.Slerp(Quaternion.Euler(currentRotation), Quaternion.Euler(targetRotation), lerpTimer);
-        }
-        else
-        {
-            transform.localRotation = Quaternion.Lerp(Quaternion.Euler(currentRotation), Quaternion.Euler(targetRotation), lerpTimer);
-        }
+            targetRotation += new Vector3(Input.GetAxis("Mouse Y") * mouseSpeedY, Input.GetAxis("Mouse X") * mouseSpeedX, 0f);
+            targetRotation.x = Mathf.Clamp(targetRotation.x, yClamp.x, yClamp.y);
+            targetRotation.z = 0f;
+
+            lerpTimer += Time.unscaledDeltaTime * lerpSpeed;
+            lerpTimer = targetRotation == currentRotation ? 0f : lerpTimer;
+            currentRotation = lerpTimer >= 1f ? targetRotation : currentRotation;
+
+            if (smoothLerp)
+            {
+                transform.localRotation = Quaternion.Slerp(Quaternion.Euler(currentRotation), Quaternion.Euler(targetRotation), lerpTimer);
+            }
+            else
+            {
+                transform.localRotation = Quaternion.Lerp(Quaternion.Euler(currentRotation), Quaternion.Euler(targetRotation), lerpTimer);
+            }
+        }  
     }
 }

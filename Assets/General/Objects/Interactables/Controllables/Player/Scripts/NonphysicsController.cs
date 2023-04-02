@@ -10,38 +10,54 @@ public class NonphysicsController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (smoothMovement)
+        if (!GameState.GetState())
         {
             Vector3 position = transform.localPosition;
-            float run = Mathf.Clamp(Input.GetAxis("Run") * runMultiplier, 1f, runMultiplier);
 
-            position += transform.forward 
-                * (Input.GetAxis("Forward") * forwardSpeed) 
-                * run
-                * Time.unscaledDeltaTime;
+            if (smoothMovement)
+            {
+                float run = Mathf.Clamp((Input.GetAxis("Run") / Time.timeScale) * runMultiplier, 1f, runMultiplier);
 
-            position += transform.right 
-                * (Input.GetAxis("Horizontal") * horizontalSpeed) 
-                * run
-                * Time.unscaledDeltaTime;
+                position += transform.forward
+                    * ((Input.GetAxis("Forward") / Time.timeScale) * forwardSpeed)
+                    * run
+                    * Mathf.Clamp(Time.unscaledDeltaTime, 0f, 1f/3f);
 
-            position += new Vector3(0f, 
-                Input.GetAxis("Vertical") * verticalSpeed 
-                * run 
-                * Time.unscaledDeltaTime, 
+                position += transform.right
+                    * ((Input.GetAxis("Horizontal") / Time.timeScale) * horizontalSpeed)
+                    * run
+                    * Mathf.Clamp(Time.unscaledDeltaTime, 0f, 1f/3f);
+
+                position += new Vector3(0f,
+                    (Input.GetAxis("Vertical") / Time.timeScale) * verticalSpeed
+                    * run
+                    * Mathf.Clamp(Time.unscaledDeltaTime, 0f, 1f/3f),
                 0f);
 
-            transform.localPosition = position;
+                transform.localPosition = position;
+            }
+
+            else
+            {
+                float run = Mathf.Clamp(Input.GetAxisRaw("Run") * runMultiplier, 1f, runMultiplier);
+
+                position += transform.forward
+                    * ((Input.GetAxisRaw("Forward") * forwardSpeed)
+                    * run
+                    * Time.unscaledDeltaTime);
+                position += transform.right
+                    * ((Input.GetAxisRaw("Horizontal") * horizontalSpeed)
+                    * run
+                    * Time.unscaledDeltaTime);
+                position += new Vector3(0f,
+                    (Input.GetAxisRaw("Vertical") * verticalSpeed)
+                    * run
+                    * Time.unscaledDeltaTime,
+                    0f);
+                transform.localPosition = position;
+            }
         }
 
-        else
-        {
-            Vector3 position = transform.localPosition;
-
-            position += transform.forward * (Input.GetAxisRaw("Forward") * forwardSpeed * Time.unscaledDeltaTime);
-            position += transform.right * (Input.GetAxisRaw("Horizontal") * horizontalSpeed * Time.unscaledDeltaTime);
-            position += new Vector3(0f, Input.GetAxisRaw("Vertical") * verticalSpeed * Time.unscaledDeltaTime, 0f);
-            transform.localPosition = position;
-        }
+        
     }
 }
