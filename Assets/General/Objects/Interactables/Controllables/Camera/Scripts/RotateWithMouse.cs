@@ -8,7 +8,8 @@ public class RotateWithMouse : MonoBehaviour
     [Tooltip("Give negative values to invert")]
     [SerializeField] private float mouseSpeedX;
     [SerializeField] private float mouseSpeedY;
-    [SerializeField] private Vector2 xClamp, yClamp;
+    [SerializeField] private bool clampX, clampY;
+    [SerializeField] private Vector2 xClampValues, yClampValues;
 
     [Header("Lerp & Transition")]
     [SerializeField] private bool smoothLerp = true;
@@ -29,8 +30,9 @@ public class RotateWithMouse : MonoBehaviour
         if (!GameState.IsPaused())
         {
             targetRotation += new Vector3(Input.GetAxis("Mouse Y") * mouseSpeedY, Input.GetAxis("Mouse X") * mouseSpeedX, 0f);
-            targetRotation.x = Mathf.Clamp(targetRotation.x, yClamp.x, yClamp.y);
-            targetRotation.z = 0f;
+            targetRotation.x = clampY ? Mathf.Clamp(targetRotation.x, yClampValues.x, yClampValues.y) : targetRotation.x;
+            targetRotation.y = clampX ? Mathf.Clamp(targetRotation.y, yClampValues.x, yClampValues.y) : targetRotation.y;
+            //targetRotation.z = 0f;
 
             lerpTimer += Time.unscaledDeltaTime * lerpSpeed;
             lerpTimer = targetRotation == currentRotation ? 0f : lerpTimer;
