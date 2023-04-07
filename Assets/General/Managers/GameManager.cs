@@ -55,7 +55,7 @@ public class GameManager : MonoBehaviour
     {
         gamePaused = GameState.IsPaused();
 
-        Time.timeScale = gamePaused ? 0.001f : 1f;
+        Time.timeScale = gamePaused ? 0f : 1f;
         MouseManager(gamePaused);
 
         ObjectManager.EnableAtGamePause(gamePaused, enabledAtGamePause);
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         {
             gamePaused = GameState.IsPaused();
 
-            Time.timeScale = gamePaused ? 0.01f : GameState.GetTimeScale();
+            Time.timeScale = gamePaused ? 0f : GameState.GetTimeScale();
 
             MouseManager(gamePaused);
 

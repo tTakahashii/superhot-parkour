@@ -4,68 +4,181 @@ using UnityEngine;
 
 public class MovementManager : MonoBehaviour
 {  
-    private enum MovementState { controllerBased, physicsBased, nonPhysicsBased };
-    private MovementState previousState;
+    private enum MovementState { None, ControllerBased, PhysicsBased, NonPhysicsBased };
+    private MovementState previousState = MovementState.None;
 
-    [Header("Movement States")]
+    [Header("Movement Settings")]
     [SerializeField] private MovementState playerState;
+    [SerializeField] private Vector3 boxcastOffset, boxcastSize;
+    [SerializeField] private float maxDistance;
+    [SerializeField] private LayerMask layerMask;
+    private bool isGrounded;
+    private RaycastHit hit;
 
     [Header("CharacterController Settings")]
     [SerializeField] private CharacterController charController;
     [SerializeField] private float forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, gravityMultiplier;
-    [SerializeField] private bool smoothCH;
+    [SerializeField] private bool smoothCH, groundDetectionCH = true;
 
     [Header("PhysicsController Settings")]
     [SerializeField] private Rigidbody rb;
     [SerializeField] private float forwardSpeedPH, horizontalSpeedPH, jumpForcePH, runMultiplierPH;
-    [SerializeField] private bool smoothPH;
+    [SerializeField] private bool smoothPH, groundDetectionPH = true;
 
     [Header("NonPhysicsController Settings")]
     [SerializeField] private Transform cam;
     [SerializeField] private float forwardSpeedNonPH, horizontalSpeedNonPH, verticalSpeedNonPH, runMultiplierNonPH;
 
+    private float forward = 0f, horizontal = 0f, vertical = 0f, run = 0f; 
+    private Vector3 gravity = Vector3.zero;
+    private bool shouldJump = false;
+
     void Update()
     {
-        OnStateChange(charController, rb);
-        MovementStateManager(playerState);
+        if (!GameState.IsPaused())
+        {
+            OnStateChange(charController, rb);
+            MovementStateManager(playerState);
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (!GameState.IsPaused())
+        {
+            isGrounded = GroundDetection();
+        } 
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        float rayLength = isGrounded ? hit.distance : maxDistance;
+        Gizmos.DrawRay(transform.position, -transform.up * rayLength);
+        Gizmos.DrawWireCube(transform.position + -transform.up * rayLength, boxcastSize * 2f);
+
+        //Gizmos.matrix = transform.localToWorldMatrix;
+        //Gizmos.DrawWireCube(boxcastOffset, boxcastSize * 2f);
     }
 
     private void MovementStateManager(MovementState state)
     {
         switch (state)
         {
-            case MovementState.controllerBased:
-                CharController(charController, forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, smoothCH);
+            case MovementState.ControllerBased:
+                CharController(charController, forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, gravityMultiplier, isGrounded, smoothCH);
                 break;
-            case MovementState.physicsBased:
-                PhysicsController(rb, forwardSpeedPH, horizontalSpeedPH, jumpForcePH, runMultiplierPH, smoothPH);
+            case MovementState.PhysicsBased:
+                PhysicsController(rb, forwardSpeedPH, horizontalSpeedPH, jumpForcePH, runMultiplierPH, smoothPH, shouldJump);
                 break;
-            case MovementState.nonPhysicsBased:
+            case MovementState.NonPhysicsBased:
                 NonPhysicsController(cam, forwardSpeedNonPH, horizontalSpeedNonPH, verticalSpeedNonPH, runMultiplierNonPH);
                 break;
         }
     }
 
-    private void CharController(CharacterController charController, float forwardSpeed, float horizontalSpeed, float jumpSpeed, float runMultiplier, bool smoothMovement)
+    private bool GroundDetection()
     {
-        float horizontal = horizontalSpeed * (smoothMovement ? Input.GetAxis("Horizontal") : Input.GetAxisRaw("Horizontal"));
-        float forward = forwardSpeed * (smoothMovement ? Input.GetAxis("Forward") : Input.GetAxisRaw("Forward"));
-        float run = Mathf.Clamp(runMultiplier * (smoothMovement ? Input.GetAxis("Run") : Input.GetAxisRaw("Run")), 1f, runMultiplier);
+        bool isGrounded;
 
-        Vector3 movement = transform.forward * forward * run;
+        switch (playerState)
+        {
+            case MovementState.ControllerBased:
+                isGrounded = groundDetectionCH ? Physics.BoxCast(transform.position, boxcastSize, -transform.up, out hit, transform.rotation, maxDistance, layerMask) : false;
+                break;
+            case MovementState.PhysicsBased:
+                isGrounded = groundDetectionPH ? Physics.BoxCast(transform.position, boxcastSize, -transform.up, out hit, transform.rotation, maxDistance, layerMask) : false;
+                break;
+            default:
+                isGrounded = false;
+                break;
+        }
 
-        charController.Move(movement);
+        return isGrounded;
     }
 
-    private void PhysicsController(Rigidbody rb, float forwardSpeed, float horizontalSpeed, float jumpSpeed, float runMultiplier, bool smoothMovement)
+    public void ChangeState()
     {
-        float horizontal = horizontalSpeed * (smoothMovement ? Input.GetAxis("Horizontal") : Input.GetAxisRaw("Horizontal"));
-        float forward = forwardSpeed * (smoothMovement ? Input.GetAxis("Forward") : Input.GetAxisRaw("Forward"));
-        float run = Mathf.Clamp(runMultiplier * (smoothMovement ? Input.GetAxis("Run") : Input.GetAxisRaw("Run")), 1f, runMultiplier);
+
+    }
+
+
+    private void OnStateChange(CharacterController charController, Rigidbody rb)
+    {
+        if (previousState != playerState)
+        {
+            previousState = playerState;
+
+            switch (playerState)
+            {
+                case MovementState.ControllerBased:
+                    charController.enabled = true;
+
+                    rb.isKinematic = true;
+                    rb.detectCollisions = false;
+
+                    break;
+
+                case MovementState.PhysicsBased:                    
+                    rb.isKinematic = false;
+                    rb.detectCollisions = true;
+
+                    charController.enabled = false;
+
+                    break;
+
+                case MovementState.NonPhysicsBased:
+                    rb.isKinematic = true;
+                    rb.detectCollisions = false;
+
+                    charController.enabled = false;
+
+                    break;
+            }
+        }
+    }
+
+    private void CharController(CharacterController charController, float forwardSpeed, float horizontalSpeed, float jumpSpeed, float runMultiplier, float gravityMultiplier, bool isGrounded, bool smoothMovement)
+    {
+        horizontal = horizontalSpeed * (smoothMovement ? Input.GetAxis("Horizontal") : Input.GetAxisRaw("Horizontal"));
+        forward = forwardSpeed * (smoothMovement ? Input.GetAxis("Forward") : Input.GetAxisRaw("Forward"));
+
+        if (isGrounded)
+        {
+            if (Input.GetAxisRaw("Vertical") > 0f)
+            {
+                vertical = jumpForceCH;
+            }
+            else
+            {
+                vertical = 0f;
+            }
+        }
+
+        //vertical = Input.GetAxisRaw("Vertical") > 0f ? jumpForceCH : vertical;
+        //vertical = isGrounded ? 0f : vertical;
+        run = Mathf.Clamp(runMultiplier * (smoothMovement ? Input.GetAxis("Run") : Input.GetAxisRaw("Run")), 1f, runMultiplier);
+
+        Vector3 forwardMovement = transform.forward * forward * run;
+        Vector3 horizontalMovement = transform.right * horizontal * run;
+        Vector3 verticalMovement = transform.up * vertical;
+
+        gravity += ((Physics.gravity * gravityMultiplier) * Time.deltaTime);
+        gravity = isGrounded ? Vector3.zero : gravity;
+        Debug.Log(gravity);
+
+        charController.Move(((forwardMovement + horizontalMovement) + (verticalMovement + gravity)) * Time.deltaTime);
+    }
+
+    private void PhysicsController(Rigidbody rb, float forwardSpeed, float horizontalSpeed, float jumpSpeed, float runMultiplier, bool smoothMovement, bool shouldJump)
+    {
+        horizontal = horizontalSpeed * (smoothMovement ? Input.GetAxis("Horizontal") : Input.GetAxisRaw("Horizontal"));
+        forward = forwardSpeed * (smoothMovement ? Input.GetAxis("Forward") : Input.GetAxisRaw("Forward"));
+        run = Mathf.Clamp(runMultiplier * (smoothMovement ? Input.GetAxis("Run") : Input.GetAxisRaw("Run")), 1f, runMultiplier);
 
         Vector3 relativeVelocity = transform.InverseTransformDirection(rb.velocity);
         relativeVelocity.x = horizontal * run;
-        relativeVelocity.y = Input.GetAxis("Vertical") != 0f ? jumpSpeed * (smoothMovement ? Input.GetAxis("Vertical") : Input.GetAxisRaw("Vertical")) : relativeVelocity.y;
+        shouldJump = (isGrounded && Input.GetAxisRaw("Vertical") > 0f);
+        relativeVelocity.y = shouldJump ? jumpSpeed : relativeVelocity.y;
         relativeVelocity.z = forward * run; ;
         rb.velocity = transform.TransformDirection(relativeVelocity);
     }
@@ -73,7 +186,7 @@ public class MovementManager : MonoBehaviour
     private void NonPhysicsController(Transform camera, float forwardSpeed, float horizontalSpeed, float verticalSpeed, float runMultiplier)
     {
         Vector3 position = transform.localPosition;
-        float run = Mathf.Clamp(Input.GetAxisRaw("Run") * runMultiplier, 1f, runMultiplier);
+        run = Mathf.Clamp(Input.GetAxisRaw("Run") * runMultiplier, 1f, runMultiplier);
 
         position += camera.transform.forward
             * ((Input.GetAxisRaw("Forward") * forwardSpeed)
@@ -119,43 +232,4 @@ public class MovementManager : MonoBehaviour
         //}
     }
 
-    public void ChangeState()
-    {
-
-    }
-
-    private void OnStateChange(CharacterController charController, Rigidbody rb)
-    {
-        if (previousState != playerState)
-        {
-            previousState = playerState;
-
-            switch (playerState)
-            {
-                case MovementState.controllerBased:
-                    charController.enabled = true;
-
-                    rb.isKinematic = true;
-                    rb.detectCollisions = false;
-
-                    break;
-
-                case MovementState.physicsBased:                    
-                    rb.isKinematic = false;
-                    rb.detectCollisions = true;
-
-                    charController.enabled = false;
-
-                    break;
-
-                case MovementState.nonPhysicsBased:
-                    rb.isKinematic = true;
-                    rb.detectCollisions = false;
-
-                    charController.enabled = false;
-
-                    break;
-            }
-        }
-    }
 }

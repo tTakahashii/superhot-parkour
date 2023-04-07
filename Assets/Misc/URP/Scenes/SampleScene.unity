@@ -360,7 +360,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 362168929}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -10.42, y: 5.15, z: 0}
+  m_LocalPosition: {x: -10.42, y: 3.7, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -378,6 +378,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a83edd42222ac2548940095c28191878, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  creationOrigin: {fileID: 362168930}
+  objectsToCreate:
+  - {fileID: 8393541296830626793, guid: 12b0ee6400774d04a932fd4b68bddd27, type: 3}
+  randomizerOffset: {x: 10, y: 0, z: 10}
+  randomizedDelay: {x: 0.1, y: 0.2}
+  destroyTime: 10
+  gizmoColor: {r: 0.57040644, g: 0, b: 1, a: 1}
 --- !u!1 &445854718
 GameObject:
   m_ObjectHideFlags: 0
@@ -620,7 +627,7 @@ GameObject:
   m_Component:
   - component: {fileID: 994097176}
   - component: {fileID: 994097177}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: CameraPivot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -657,9 +664,9 @@ MonoBehaviour:
   mouseSpeedX: 0
   mouseSpeedY: -2
   clampX: 0
-  clampY: 0
+  clampY: 1
   xClampValues: {x: 0, y: 0}
-  yClampValues: {x: 0, y: 0}
+  yClampValues: {x: -60, y: 60}
   smoothLerp: 1
   lerpSpeed: 10
 --- !u!1 &1468357117
@@ -769,7 +776,7 @@ GameObject:
   - component: {fileID: 1565404379}
   - component: {fileID: 1565404378}
   - component: {fileID: 1565404377}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: PlayerModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -872,7 +879,7 @@ GameObject:
   - component: {fileID: 1687258584}
   - component: {fileID: 1687258582}
   - component: {fileID: 1687258586}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}
@@ -910,7 +917,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0
@@ -1227,7 +1234,7 @@ GameObject:
   - component: {fileID: 2067867219}
   - component: {fileID: 2067867216}
   - component: {fileID: 2067867215}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1242,7 +1249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067867210}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18, y: 3.03, z: 1.31}
+  m_LocalPosition: {x: 0.18, y: 3.03, z: 1.41}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1565404376}
@@ -1312,19 +1319,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerState: 1
+  boxcastOffset: {x: 0, y: 0, z: 0}
+  boxcastSize: {x: 0.25, y: 0.1, z: 0.25}
+  maxDistance: 1
+  layerMask:
+    serializedVersion: 2
+    m_Bits: 51
   charController: {fileID: 2067867219}
-  forwardSpeedCH: 10
-  horizontalSpeedCH: 10
-  jumpForceCH: 10
+  forwardSpeedCH: 5
+  horizontalSpeedCH: 5
+  jumpForceCH: 4
   runMultiplierCH: 2
   gravityMultiplier: 1
-  smoothCH: 0
+  smoothCH: 1
   rb: {fileID: 2067867214}
-  forwardSpeedPH: 10
-  horizontalSpeedPH: 10
-  jumpForcePH: 10
+  forwardSpeedPH: 5
+  horizontalSpeedPH: 5
+  jumpForcePH: 4
   runMultiplierPH: 2
-  smoothPH: 0
+  smoothPH: 1
   cam: {fileID: 0}
   forwardSpeedNonPH: 10
   horizontalSpeedNonPH: 10
@@ -1339,7 +1352,7 @@ CharacterController:
   m_GameObject: {fileID: 2067867210}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 2
   m_Height: 2
   m_Radius: 0.5
