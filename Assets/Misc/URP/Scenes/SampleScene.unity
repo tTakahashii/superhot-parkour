@@ -1249,7 +1249,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2067867210}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.18, y: 3.03, z: 1.41}
+  m_LocalPosition: {x: 0.18, y: 3.03, z: 0.73}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1565404376}
@@ -1318,10 +1318,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 04316f9cfaf864042b77f8fd33ede98a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerState: 1
+  playerState: 2
+  maxDistance: 1
   boxcastOffset: {x: 0, y: 0, z: 0}
   boxcastSize: {x: 0.25, y: 0.1, z: 0.25}
-  maxDistance: 1
   layerMask:
     serializedVersion: 2
     m_Bits: 51
@@ -1332,13 +1332,15 @@ MonoBehaviour:
   runMultiplierCH: 2
   gravityMultiplier: 1
   smoothCH: 1
+  groundDetectionCH: 1
   rb: {fileID: 2067867214}
   forwardSpeedPH: 5
   horizontalSpeedPH: 5
   jumpForcePH: 4
   runMultiplierPH: 2
   smoothPH: 1
-  cam: {fileID: 0}
+  groundDetectionPH: 1
+  cam: {fileID: 1687258585}
   forwardSpeedNonPH: 10
   horizontalSpeedNonPH: 10
   verticalSpeedNonPH: 10
