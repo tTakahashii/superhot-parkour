@@ -23,12 +23,12 @@ public class MovementManager : MonoBehaviour
     private RaycastHit hit;
 
     //[Header("CharacterController Settings")]
-    [SerializeField] private CharacterController charController;
+    public CharacterController charController;
     [SerializeField] private float forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, gravityMultiplier;
     [SerializeField] private bool smoothCH, groundDetectionCH = true;
 
     //[Header("PhysicsController Settings")]
-    [SerializeField] private Rigidbody rb;
+    public Rigidbody rb;
     [SerializeField] private float forwardSpeedPH, horizontalSpeedPH, jumpForcePH, runMultiplierPH;
     [SerializeField] private bool smoothPH, groundDetectionPH = true;
 
