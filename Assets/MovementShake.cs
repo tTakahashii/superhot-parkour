@@ -39,26 +39,119 @@ public class MovementShake : MonoBehaviour
     private void ShakeCamera(Rigidbody rb, Vector3 startingPoint, Vector3 shakeOffset, Vector3 speedMultipliers, float speedClamp)
     {
         Vector3 currentPosition = Vector3.zero;
-        float velocity = Mathf.Clamp(rb.velocity.magnitude, 0f, speedClamp);
+        float magnitude = Mathf.Clamp(rb.velocity.magnitude, 0f, speedClamp);;
         //Debug.Log("RB VELOCTY: " + speed);
         //Debug.Log("SPEED:" + Time.time * speed);
 
-        if (velocity > 0.01f)
+        if (magnitude > 0.01f && rb.velocity.y < 0.1f)
         {
             defaultInterpolators = Vector3.zero;     
 
             switch (xCycle)
             {
                 case true:
+                    interpolators.x += -(Time.deltaTime * magnitude * speedMultipliers.x);
+                    xCycle = interpolators.x > 0f ? true : false;
+                    //Debug.Log("X Decreasing");
+                    break;
+
+                case false:
+                    interpolators.x += Time.deltaTime * magnitude * speedMultipliers.x;
+                    xCycle = interpolators.x < 1f ? false : true;
+                    //Debug.Log("X Increasing");
+                    break;
+            }
+
+            switch (yCycle)
+            {
+                case true:
+                    interpolators.y += -(Time.deltaTime * magnitude * speedMultipliers.y);
+                    yCycle = interpolators.y > 0f ? true : false;
+
+                    break;
+
+                case false:
+                    interpolators.y += Time.deltaTime * magnitude * speedMultipliers.y;
+                    yCycle = interpolators.y < 1f ? false : true;
+
+                    break;
+            }
+
+            switch (zCycle)
+            {
+                case true:
+                    interpolators.z += -(Time.deltaTime * magnitude * speedMultipliers.z);
+                    zCycle = interpolators.z > 0f ? true : false;
+
+                    break;
+
+                case false:
+                    interpolators.z += Time.deltaTime * magnitude * speedMultipliers.z;
+                    zCycle = interpolators.z < 1f ? false : true;
+
+                    break;
+            }
+
+            currentPosition.x = Mathf.Lerp(-shakeOffset.x, shakeOffset.x, interpolators.x);
+            currentPosition.y = Mathf.Lerp(-shakeOffset.y, shakeOffset.y, interpolators.y);
+            currentPosition.z = Mathf.Lerp(-shakeOffset.z, shakeOffset.z, interpolators.z);
+
+            latestPosition = currentPosition;
+
+            //Debug.Log("MOVING");
+        }
+
+        else
+        {
+            defaultInterpolators.x += Time.deltaTime * speedMultipliers.x;
+            defaultInterpolators.y += Time.deltaTime * speedMultipliers.y;
+            defaultInterpolators.z += Time.deltaTime * speedMultipliers.z;
+
+            currentPosition.x = Mathf.Lerp(latestPosition.x, startingPoint.x, defaultInterpolators.x);
+            currentPosition.y = Mathf.Lerp(latestPosition.y, startingPoint.y, defaultInterpolators.y);
+            currentPosition.z = Mathf.Lerp(latestPosition.z, startingPoint.z, defaultInterpolators.z);
+
+            //Debug.Log("STATIC");
+        }
+
+        //Debug.Log(defaultInterpolators);
+
+        //Debug.Log("X: " + interpolators.x);
+
+        
+
+        //currentPosition.x = shakeOffset.x != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.x, shakeOffset.x * 2f) - shakeOffset.x : 0f;
+        //currentPosition.y = shakeOffset.y != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.y, shakeOffset.y * 2f) - shakeOffset.y : 0f;
+        //currentPosition.z = shakeOffset.z != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.z, shakeOffset.z * 2f) - shakeOffset.z : 0f;
+
+        //currentPosition = speed > 0.01f ? currentPosition : startingPoint;
+
+        transform.localPosition = currentPosition;
+    }
+
+    private void ShakeCamera(CharacterController charController, Vector3 startingPoint, Vector3 shakeOffset, Vector3 speedMultipliers, float speedClamp)
+    {
+        Vector3 currentPosition = Vector3.zero;
+        float velocity = Mathf.Clamp(charController.velocity.magnitude, 0f, speedClamp);
+        //Debug.Log("RB VELOCTY: " + speed);
+        //Debug.Log("SPEED:" + Time.time * speed);
+
+        if (velocity > 0.01f)
+        {
+            defaultInterpolators = Vector3.zero;
+
+            switch (xCycle)
+            {
+                case true:
                     interpolators.x += -(Time.deltaTime * velocity * speedMultipliers.x);
                     xCycle = interpolators.x > 0f ? true : false;
-                    Debug.Log("X Decreasing");
+                    //Debug.Log("X Decreasing");
                     break;
 
                 case false:
                     interpolators.x += Time.deltaTime * velocity * speedMultipliers.x;
                     xCycle = interpolators.x < 1f ? false : true;
-                    Debug.Log("X Increasing");
+                    //Debug.Log("X Increasing");
                     break;
             }
 
@@ -98,7 +191,7 @@ public class MovementShake : MonoBehaviour
 
             latestPosition = currentPosition;
 
-            Debug.Log("MOVING");
+            //Debug.Log("MOVING");
         }
 
         else
@@ -111,38 +204,20 @@ public class MovementShake : MonoBehaviour
             currentPosition.y = Mathf.Lerp(latestPosition.y, startingPoint.y, defaultInterpolators.y);
             currentPosition.z = Mathf.Lerp(latestPosition.z, startingPoint.z, defaultInterpolators.z);
 
-            Debug.Log("STATIC");
+            //Debug.Log("STATIC");
         }
 
-        Debug.Log(defaultInterpolators);
+        //Debug.Log(defaultInterpolators);
 
         //Debug.Log("X: " + interpolators.x);
 
-        
+
 
         //currentPosition.x = shakeOffset.x != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.x, shakeOffset.x * 2f) - shakeOffset.x : 0f;
         //currentPosition.y = shakeOffset.y != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.y, shakeOffset.y * 2f) - shakeOffset.y : 0f;
         //currentPosition.z = shakeOffset.z != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.z, shakeOffset.z * 2f) - shakeOffset.z : 0f;
 
         //currentPosition = speed > 0.01f ? currentPosition : startingPoint;
-
-        transform.localPosition = currentPosition;
-    }
-
-    private void ShakeCamera(CharacterController charController, Vector3 startingPoint, Vector3 shakeOffset, Vector3 speedMultipliers, float speedClamp)
-    {
-        Vector3 currentPosition = Vector3.zero;
-
-        float speed = Mathf.Clamp(charController.velocity.magnitude, 0f, speedClamp);
-
-        Debug.Log("CONTROLLER VELOCTY: " + speed);
-        Debug.Log("SPEED:" + Time.time * speed);
-
-        currentPosition.x = shakeOffset.x != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.x, shakeOffset.x * 2f) - shakeOffset.x : 0f;
-        currentPosition.y = shakeOffset.y != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.y, shakeOffset.y * 2f) - shakeOffset.y : 0f;
-        currentPosition.z = shakeOffset.z != 0f ? Mathf.PingPong(Time.time * speed * speedMultipliers.z, shakeOffset.z * 2f) - shakeOffset.z : 0f;
-
-        currentPosition = speed > 0.1f ? currentPosition : startingPoint;
 
         transform.localPosition = currentPosition;
     }

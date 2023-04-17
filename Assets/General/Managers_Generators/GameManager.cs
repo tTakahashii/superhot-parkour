@@ -64,7 +64,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        
+        Time.timeScale = gamePaused ? 0f : GameState.GetTimeScale();
         OnStateChange();
         StateManager();
     }
@@ -96,7 +96,7 @@ public class GameManager : MonoBehaviour
         {
             gamePaused = GameState.IsPaused();
 
-            Time.timeScale = gamePaused ? 0f : GameState.GetTimeScale();
+            
 
             MouseManager(gamePaused);
 

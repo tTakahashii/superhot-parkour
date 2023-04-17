@@ -2,10 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 [DisallowMultipleComponent]
 public class MovementManager : MonoBehaviour
 {  
@@ -65,6 +61,19 @@ public class MovementManager : MonoBehaviour
 
         //Gizmos.matrix = transform.localToWorldMatrix;
         //Gizmos.DrawWireCube(boxcastOffset, boxcastSize * 2f);
+    }
+
+    public Vector3 GetVelocity()
+    {
+        switch (playerState)
+        {
+            case MovementState.ControllerBased:
+                return charController.velocity;
+            case MovementState.PhysicsBased:
+                return rb.velocity;
+            default:
+                return Vector3.zero;
+        }
     }
 
     private void MovementStateManager(MovementState state)
@@ -240,111 +249,3 @@ public class MovementManager : MonoBehaviour
     }
 
 }
-
-//#if UNITY_EDITOR
-//[CustomEditor(typeof(MovementManager))]
-//[CanEditMultipleObjects]
-////public class MovementManagerEditor : Editor
-////{
-////    public override void OnInspectorGUI()
-////    {
-////        base.OnInspectorGUI();
-////    }
-////}
-//public class MovementManagerEditor : Editor
-//{
-//    #region
-
-//    // CharController properties
-//    private SerializedProperty charController,
-//        forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, gravityMultiplier,
-//        smoothCH, groundDetectionCH;
-
-//    // PhysicsController properties
-//    private SerializedProperty rb,
-//        forwardSpeedPH, horizontalSpeedPH, jumpForcePH, runMultiplierPH,
-//        smoothPH, groundDetectionPH;
-
-//    private SerializedProperty cam,
-//        forwardSpeedNonPH, horizontalSpeedNonPH, verticalSpeedNonPH, runMultiplierNonPH;
-
-//    // NonPhysicsController properties
-
-//    #endregion
-
-//    private void OnEnable()
-//    {
-//        // CHARCONTROLLER
-//        charController = serializedObject.FindProperty("charController");
-//        forwardSpeedCH = serializedObject.FindProperty("forwardSpeedCH");
-//        horizontalSpeedCH = serializedObject.FindProperty("horizontalSpeedCH");
-//        jumpForceCH = serializedObject.FindProperty("jumpForceCH");
-//        runMultiplierCH = serializedObject.FindProperty("runMultiplierCH");
-//        gravityMultiplier = serializedObject.FindProperty("gravityMultiplier");
-//        smoothCH = serializedObject.FindProperty("smoothCH");
-//        groundDetectionCH = serializedObject.FindProperty("groundDetectionCH");
-
-//        // PHYSICSCONTROLLER
-//        rb = serializedObject.FindProperty("rb");
-//        forwardSpeedPH = serializedObject.FindProperty("forwardSpeedPH");
-//        horizontalSpeedPH = serializedObject.FindProperty("horizontalSpeedPH");
-//        jumpForcePH = serializedObject.FindProperty("jumpForcePH");
-//        runMultiplierPH = serializedObject.FindProperty("runMultiplierPH");
-//        smoothPH = serializedObject.FindProperty("smoothPH");
-//        groundDetectionPH = serializedObject.FindProperty("groundDetectionPH");
-
-//        //NONPHYSICSCONTROLLER
-//        cam = serializedObject.FindProperty("cam");
-//        forwardSpeedNonPH = serializedObject.FindProperty("forwardSpeedNonPH");
-//        horizontalSpeedNonPH = serializedObject.FindProperty("horizontalSpeedNonPH");
-//        verticalSpeedNonPH = serializedObject.FindProperty("verticalSpeedNonPH");
-//        runMultiplierNonPH = serializedObject.FindProperty("runMultiplierNonPH");
-//    }
-
-//    public override void OnInspectorGUI()
-//    {
-//        serializedObject.Update();
-
-//        EditorGUILayout.PropertyField(charController);
-//        EditorGUILayout.PropertyField(forwardSpeedCH);
-
-//        serializedObject.ApplyModifiedProperties();
-
-//        //SerializedProperty 
-//        //MovementManager movementManager = (MovementManager)target;
-//        //base.OnInspectorGUI();
-//        //Undo.RecordObject(movementManager, "Movement Manager Changes");
-
-//        //EditorGUILayout.PropertyField(movementManager.);
-
-//        //DrawDefaultInspector();
-
-//        //EditorGUILayout.BeginFoldoutHeaderGroup(false, "anan");
-//    }
-//}
-
-//[CustomPropertyDrawer(typeof(MovementManager))]
-//public class MovementManagerDrawer : PropertyDrawer
-//{
-//    private SerializedProperty charController,
-//        forwardSpeedCH, horizontalSpeedCH, jumpForceCH, runMultiplierCH, gravityMultiplier,
-//        smoothCH, groundDetectionCH;
-
-//    // How to draw to the Inspector window
-//    public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-//    {
-//        base.OnGUI(position, property, label);
-//    }
-
-//    // Request more vertical space, return it
-//    public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
-//    {
-//        int totalLines = 1;
-
-//        float lineHeight = EditorGUIUtility.singleLineHeight;
-
-//        return EditorGUIUtility.singleLineHeight * totalLines;
-//    }
-//}
-
-//#endif
