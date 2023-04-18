@@ -36,6 +36,60 @@ public class MovementManager : MonoBehaviour
     private Vector3 gravity = Vector3.zero;
     private bool shouldJump = false;
 
+    public float forwardSpeed
+    {
+        get
+        {
+            switch (playerState)
+            {
+                case MovementState.ControllerBased:
+                    return forwardSpeedCH;
+
+                case MovementState.PhysicsBased:
+                    return forwardSpeedPH;
+
+                default:
+                    return 0f;
+            }
+        }
+    }
+
+    public float horizontalSpeed
+    {
+        get
+        {
+            switch (playerState)
+            {
+                case MovementState.ControllerBased:
+                    return horizontalSpeedCH;
+
+                case MovementState.PhysicsBased:
+                    return horizontalSpeedPH;
+
+                default:
+                    return 0f;
+            }
+        }
+    }
+
+    public float runningSpeed
+    {
+        get
+        {
+            switch (playerState)
+            {
+                case MovementState.ControllerBased:
+                    return runMultiplierCH;
+
+                case MovementState.PhysicsBased:
+                    return runMultiplierPH;
+
+                default:
+                    return 0f;
+            }
+        }
+    }
+
     void Update()
     {
         if (!GameState.IsPaused())
@@ -63,14 +117,14 @@ public class MovementManager : MonoBehaviour
         //Gizmos.DrawWireCube(boxcastOffset, boxcastSize * 2f);
     }
 
-    public Vector3 GetVelocity()
+    public Vector3 GetVelocity(bool localVelocity = true)
     {
         switch (playerState)
         {
             case MovementState.ControllerBased:
-                return charController.velocity;
+                return localVelocity ? transform.InverseTransformDirection(charController.velocity) : charController.velocity;
             case MovementState.PhysicsBased:
-                return rb.velocity;
+                return localVelocity ? transform.InverseTransformDirection(rb.velocity) : rb.velocity;
             default:
                 return Vector3.zero;
         }
