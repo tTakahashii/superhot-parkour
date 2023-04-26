@@ -19,9 +19,11 @@ public class PlayerAnimator : MonoBehaviour
     private void AnimatorStateController()
     {
         float velocityZ = playerManager.GetVelocity().z;
-        float absVelocityX = Mathf.Abs(playerManager.GetVelocity().x);
+        float velocityX = playerManager.GetVelocity().x;
 
         //Debug.Log("VELOCITY: " + playerManager.GetVelocity());
+
+        // FORWARD & BACKWARD RUNNING ANIMATION
 
         if (velocityZ >= playerManager.forwardSpeed + 0.05f)
         {
@@ -39,14 +41,28 @@ public class PlayerAnimator : MonoBehaviour
         {
             animState = AnimatorState.RunningBackwardSlow;
         }
-        else if (absVelocityX >= playerManager.horizontalSpeed + 0.05f)
+
+        // HORIZONTAL RUNNING ANIMATION
+
+        else if (velocityX >= playerManager.horizontalSpeed - 0.05f)
         {
             animState = AnimatorState.RunningSidewaysFast;
         }
-        else if (absVelocityX >= 0.05f)
+        else if (velocityX >= 0.05f)
         {
             animState = AnimatorState.RunningSidewaysSlow;
         }
+
+        else if (velocityX <= -playerManager.horizontalSpeed + 0.05f)
+        {
+            animState = AnimatorState.RunningSidewaysFast;
+        }
+        else if (velocityX >= 0.05f)
+        {
+            animState = AnimatorState.RunningSidewaysSlow;
+        }
+
+        // IDLE
         else
         {
             animState = AnimatorState.Idle;
@@ -54,10 +70,11 @@ public class PlayerAnimator : MonoBehaviour
         
         if (previousState != animState)
         {
-            previousState = animState;
-            playerAnimator.SetTrigger(Enum.GetName(typeof(AnimatorState), animState));
             Debug.Log("PREVIOUS STATE: " + previousState);
+            previousState = animState;
+            playerAnimator.SetTrigger(Enum.GetName(typeof(AnimatorState), previousState));
             Debug.Log("STATE: " + animState);
+            
         }
         //Debug.Log();
     }

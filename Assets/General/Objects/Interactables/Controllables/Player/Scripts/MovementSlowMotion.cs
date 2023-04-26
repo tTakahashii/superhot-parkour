@@ -11,7 +11,6 @@ public class MovementSlowMotion : MonoBehaviour
     private float startingScale, currentScale, desiredScale, transitionTimer = 0f;
 
     private enum TimescaleState { slowingDown, speedingUp, neutral }
-    private TimescaleState currentState;
 
     private bool movementStateChanged = false, staticStateChanged = false;
 
@@ -30,7 +29,6 @@ public class MovementSlowMotion : MonoBehaviour
         {
             if (!movementStateChanged)
             {
-                currentState = TimescaleState.speedingUp;
                 transitionTimer = 0f;
                 startingScale = GameState.GetTimeScale();
                 desiredScale = speedUpScale;
@@ -44,7 +42,6 @@ public class MovementSlowMotion : MonoBehaviour
         {
             if (!staticStateChanged)
             {
-                currentState = TimescaleState.slowingDown;
                 transitionTimer = 0f;
                 startingScale = GameState.GetTimeScale();
                 desiredScale = slowedDownScale;
